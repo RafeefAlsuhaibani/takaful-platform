@@ -1,30 +1,23 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from .views import (
     AdminProjectViewSet,
     AdminServiceViewSet,
-    AdminServiceRequestViewSet,
-    AdminVolunteerViewSet,
     AdminSuggestionViewSet,
-    LoginView,
-    RegisterView,
-   # submit_suggestion,
-
-   
+    ProjectListAPIView,
+    ServiceListAPIView,
+    SuggestionCreateAPIView,
 )
 
-
-# DRF router for admin APIs
-admin_router = DefaultRouter()
-admin_router.register("projects", AdminProjectViewSet, basename="admin-project")
-admin_router.register("services", AdminServiceViewSet, basename="admin-service")
-admin_router.register("service-requests", AdminServiceRequestViewSet, basename="admin-service-request")
-admin_router.register("volunteers", AdminVolunteerViewSet, basename="admin-volunteer")
-admin_router.register("suggestions", AdminSuggestionViewSet, basename="admin-suggestion")
+router = DefaultRouter()
+router.register(r"admin/projects", AdminProjectViewSet)
+router.register(r"admin/services", AdminServiceViewSet)
+router.register(r"admin/suggestions", AdminSuggestionViewSet)
 
 urlpatterns = [
-    path("admin/", include(admin_router.urls)),
-    path("auth/login/", LoginView.as_view(), name="login"),
-    path("auth/register/", RegisterView.as_view(), name="register"),
-  #  path("submit-suggestion/", submit_suggestion, name="submit_suggestion"),
+    path("", include(router.urls)),
+    path("projects/", ProjectListAPIView.as_view()),
+    path("services/", ServiceListAPIView.as_view()),
+    path("admin/suggestions/", SuggestionCreateAPIView.as_view()),
 ]

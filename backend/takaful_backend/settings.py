@@ -4,34 +4,26 @@ Django settings for takaful_backend project (Render-ready).
 
 from pathlib import Path
 import os
-
 import dj_database_url
 from dotenv import load_dotenv
+from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env for local development (Render will use real env vars)
+# Load environment variables
 load_dotenv(BASE_DIR / ".env")
-
 
 # ===========================
 # Basic security settings
 # ===========================
 
-# In production (Render) you MUST set SECRET_KEY as an env var
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
-
-# DEBUG should be False in production
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# Example:
-# ALLOWED_HOSTS="takaful-backend.onrender.com,localhost,127.0.0.1"
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
     "localhost,127.0.0.1"
 ).split(",")
-
 
 # ===========================
 # Application definition
@@ -46,18 +38,20 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Third-party apps
+    # Third-party
     "rest_framework",
+    "rest_framework_simplejwt",
     "corsheaders",
 
     # Local apps
     "core",
     "takaful_app",
+    "accounts.apps.AccountsConfig",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # CORS
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -85,12 +79,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "takaful_backend.wsgi.application"
 
-
 # ===========================
 # Database
 # ===========================
-# Local: uses SQLite
-# Render: uses DATABASE_URL (PostgreSQL)
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -99,26 +90,16 @@ DATABASES = {
     )
 }
 
-
 # ===========================
 # Password validation
 # ===========================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-
 
 # ===========================
 # Internationalization
@@ -129,23 +110,19 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-
 # ===========================
 # Static files
 # ===========================
 
 STATIC_URL = "static/"
-# Render will collect static files here
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 # ===========================
-# CORS + DRF configuration
+# CORS + DRF + JWT
 # ===========================
 
-# Local dev origins
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -153,27 +130,29 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# Optionally add your deployed frontend domain from env:
-# FRONTEND_URL="https://your-frontend.vercel.app"
 FRONTEND_URL = os.environ.get("FRONTEND_URL")
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
 # ===========================
-# CSRF (for admin or auth)
+# CSRF Trusted Origins
 # ===========================
 
-# Example you will set on Render:
-# CSRF_TRUSTED_ORIGINS="https://takaful-backend.onrender.com"
 CSRF_TRUSTED_ORIGINS = [
     origin
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")

@@ -1,34 +1,40 @@
 from rest_framework import serializers
-from .models import Project, Service, ServiceRequest, Volunteer, Suggestion
+from .models import Project, Service, Suggestion
 
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "desc",
+            "beneficiaries",
+            "status",
+            "location",
+            "category",
+        ]
 
 
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
-        fields = "__all__"
-
-
-class ServiceRequestSerializer(serializers.ModelSerializer):
-    service_name = serializers.ReadOnlyField(source="service.name")
-
-    class Meta:
-        model = ServiceRequest
-        fields = "__all__"
-
-
-class VolunteerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Volunteer
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "desc",
+            "status",
+        ]
 
 
 class SuggestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suggestion
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "description",
+            "submitted_by",
+            "created_at",
+        ]
+        read_only_fields = ("id", "created_at")
