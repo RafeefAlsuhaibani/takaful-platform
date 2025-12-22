@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     # Local apps
     "core",
     "takaful_app",
-    "accounts.apps.AccountsConfig",
+    "accounts",
 ]
 
 MIDDLEWARE = [
