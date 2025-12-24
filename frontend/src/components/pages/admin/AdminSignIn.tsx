@@ -66,11 +66,15 @@ export default function AdminSignIn() {
       const data = await res.json();
 
       // Force role = 'admin' for this page
-      login({
-        name: data.name ?? formData.email.split('@')[0],
-        email: data.email ?? formData.email,
-        role: 'admin',
-      });
+      login(
+        {
+          name: data.user?.name ?? formData.email.split('@')[0],
+          email: data.user?.email ?? formData.email,
+          role: 'admin',
+        },
+        data.access,
+        data.refresh
+      );
 
       navigate('/admin/dashboard');
     } catch (err) {

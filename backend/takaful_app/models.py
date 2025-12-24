@@ -1,26 +1,90 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Project(models.Model):
-    STATUS_CHOICES = [
-        ("PLANNED", "Planned"),
-        ("ACTIVE", "Active"),
-        ("COMPLETED", "Completed"),
+    PROJECT_TYPE_CHOICES = [
+        ("أساسي", "أساسي"),
+        ("مجتمعي", "مجتمعي"),
+        ("مؤسسي", "مؤسسي"),
     ]
 
-    title = models.CharField(max_length=200)
-    desc = models.TextField(blank=True)  # 👈 matches project.desc in FE
-
-    beneficiaries = models.IntegerField(default=0)  # 👈 matches project.beneficiaries
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="PLANNED"
-    )  # 👈 matches project.status
-    location = models.CharField(max_length=200, blank=True)  # 👈 matches project.location
-    category = models.CharField(max_length=50, blank=True)   # 👈 matches project.category
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    projectName = models.CharField(max_length=255)
+    projectType = models.CharField(max_length=20, choices=PROJECT_TYPE_CHOICES)
+    projectDescription = models.TextField()
+    targetAudience = models.CharField(max_length=255)
+    beneficiaries = models.PositiveIntegerField()
+    executionLocation = models.CharField(max_length=255)
+    donationAmount = models.DecimalField(max_digits=12, decimal_places=2)
+    startDate = models.DateField()
+    endDate = models.DateField()
+    implementationRequirements = models.TextField()
+    projectGoals = models.TextField()
+    projectDocument = models.FileField(upload_to='project_documents/', null=True, blank=True)
+    createdBy = models.ForeignKey(User, on_delete=models.CASCADE)
+    createdAt = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
+        return self.projectName
+    
+class Volunteer(models.Model):
+    STATUS_CHOICES = [
+        ('نشط', 'نشط'),
+        ('مشغول', 'مشغول'),
+        ('غير نشط', 'غير نشط'),
+    ]
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    location = models.CharField(max_length=255)
+    join_date = models.DateField(auto_now_add=True)
+    rating = models.FloatField(default=0.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    skills = models.JSONField(default=list)  # Stores skills as a list
+    volunteer_hours = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class Task(models.Model):
+    PRIORITY_CHOICES = [
+        ('منخفضة', 'منخفضة'),
+        ('متوسطة', 'متوسطة'),
+        ('عالية', 'عالية'),
+    ]
+    STATUS_CHOICES = [
+        ('في الانتظار', 'في الانتظار'),
+        ('قيد التنفيذ', 'قيد التنفيذ'),
+        ('مكتملة', 'مكتملة'),
+        ('معلقة', 'معلقة'),
+    ]
+
+    title = models.CharField(max_length=255)
+    project_name = models.CharField(max_length=255)
+    volunteer = models.ForeignKey(Volunteer, on_delete=models.SET_NULL, null=True, related_name='tasks')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
+    due_date = models.DateField()
+    hours = models.IntegerField(default=0)
+    progress = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
         return self.title
+
+class Subtask(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtasks')
+    title = models.CharField(max_length=255)
+    completed = models.BooleanField(default=False)
+
+
+
+
+
+
+
+
 
 class Service(models.Model):
     STATUS_CHOICES = [

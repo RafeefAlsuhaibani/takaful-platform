@@ -26,19 +26,19 @@ const menuItems = [
 
 export default function ArabicSidebar({ children }: SidebarLayoutProps) {
 
-    const { user, logout } = useAuth();
+    const { user, logout, access } = useAuth();
     const navigate = useNavigate();
     const [volunteerData, setVolunteerData] = useState<ProfileData | null>(null);
 
     // Fetch volunteer data from backend
     useEffect(() => {
         const fetchProfile = async () => {
-            if (!user?.access) return;
+            if (!access) return;
       
             try {
                 const res = await fetch(`${API_BASE_URL}/api/accounts/me/`, {
                     headers: {
-                        Authorization: `Bearer ${user.access}`,
+                        Authorization: `Bearer ${access}`,
                     },
                 });
       
@@ -52,7 +52,7 @@ export default function ArabicSidebar({ children }: SidebarLayoutProps) {
         };
       
         fetchProfile();
-      }, [user?.access]);
+      }, [access]);
       
 
     const handleLogout = () => {
