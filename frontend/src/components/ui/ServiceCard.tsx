@@ -25,18 +25,7 @@ export default function ServiceCard({ service, onDetails, onRegister }: ServiceC
 
   return (
     <div className="group rounded-2xl border bg-white shadow-soft p-5 relative overflow-hidden transition-all duration-300 motion-safe:hover:-translate-y-1 hover:shadow-lg">
-      {/* Hover Register Button - Desktop Only */}
-      <div className="pointer-events-none absolute inset-0 bg-transparent">
-        <div className="absolute top-3 left-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
-          <button
-            onClick={() => onRegister(service)}
-            className="pointer-events-auto rounded-full border-2 border-[#DFC775] text-[#DFC775] bg-white/90 hover:bg-[#FFF5D6] px-4 py-1.5 font-semibold text-sm transition-all duration-200 focus-visible:ring-2 ring-brand-600 ring-offset-2"
-            aria-haspopup="dialog"
-          >
-            سجّل في الخدمة
-          </button>
-        </div>
-      </div>
+
 
       {/* Header Row */}
       <div className="flex items-start justify-between mb-4">
