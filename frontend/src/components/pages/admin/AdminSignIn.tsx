@@ -164,7 +164,7 @@ export default function AdminSignIn() {
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               error={errors.email}
-              inputProps={{ dir: 'ltr', autoComplete: 'email' }}
+              inputProps={{ autoComplete: 'email' }}
               required
             />
 
