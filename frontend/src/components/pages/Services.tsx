@@ -138,23 +138,6 @@ function Services() {
         </div>
       </section>
 
-      {/* Filter Chips */}
-      <section className="py-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {filters.map((filter) => (
-              <Chip
-                key={filter.id}
-                selected={selectedFilter === filter.id}
-                onClick={() => setSelectedFilter(filter.id)}
-              >
-                {filter.label}
-              </Chip>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* خطوات الخدمة — العميل يعرف الخطوات قبل التقديم */}
       <section className="py-12 md:py-16 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4">
@@ -171,33 +154,38 @@ function Services() {
                   num: 1,
                   label: 'اختر نوع الكفالة',
                   desc: 'تصفح الخدمات المتاحة التي تريد دعمها',
+                  icon: 'Lightbulb',
                   above: true,
                 },
                 {
                   num: 2,
                   label: 'مراجعة واعتماد',
                   desc: 'يقوم الفريق المسؤول بمراجعة طلبك واعتماده خلال 24 ساعة',
+                  icon: 'ClipboardList',
                   above: false,
                 },
                 {
                   num: 3,
                   label: 'التحضير والتوصيل',
                   desc: 'يتم تكليف أفضل المتطوعين لتحضير وتوصيل الخدمة للمستفيدين',
+                  icon: 'HandHeart',
                   above: true,
                 },
                 {
                   num: 4,
                   label: 'التوثيق الميداني',
                   desc: 'يقوم المندوب بتوثيق عملية التسليم بالصور والفيديوهات',
+                  icon: 'Camera',
                   above: false,
                 },
                 {
                   num: 5,
                   label: 'تقرير التنفيذ',
                   desc: 'تستلم تقريراً مفصلاً عن التنفيذ مع الصور والتوثيق كامل',
+                  icon: 'CheckCircle2',
                   above: true,
                 },
-              ].map(({ num, label, desc, above }) => (
+              ].map(({ num, label, desc, icon, above }) => (
                 <div
                   key={num}
                   className="flex flex-1 flex-col items-center justify-center min-w-0"
@@ -212,14 +200,20 @@ function Services() {
                       </p>
                     </div>
                   ) : (
-                    <span className="h-16 md:h-20 shrink-0" aria-hidden />
+                    <span className="h-20 md:h-24 shrink-0" aria-hidden />
                   )}
-                  <span
-                    className="shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-brand-600 bg-white shadow-sm ring-2 ring-white"
+                  <div
+                    className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-brand-600 bg-white shadow-md ring-2 ring-white flex items-center justify-center"
                     aria-hidden
-                  />
+                  >
+                    <Icon
+                      name={icon}
+                      size={18}
+                      className="text-brand-600"
+                    />
+                  </div>
                   {above ? (
-                    <span className="h-16 md:h-20 shrink-0" aria-hidden />
+                    <span className="h-20 md:h-24 shrink-0" aria-hidden />
                   ) : (
                     <div className="text-center px-0.5 mt-2 space-y-0.5">
                       <p className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
@@ -233,6 +227,23 @@ function Services() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filter Chips */}
+      <section className="py-8 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {filters.map((filter) => (
+              <Chip
+                key={filter.id}
+                selected={selectedFilter === filter.id}
+                onClick={() => setSelectedFilter(filter.id)}
+              >
+                {filter.label}
+              </Chip>
+            ))}
           </div>
         </div>
       </section>
