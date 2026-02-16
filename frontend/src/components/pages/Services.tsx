@@ -155,6 +155,88 @@ function Services() {
         </div>
       </section>
 
+      {/* خطوات الخدمة — العميل يعرف الخطوات قبل التقديم */}
+      <section className="py-12 md:py-16 bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="relative" dir="rtl">
+            {/* الخط الأفقي العنابي من اليمين لليسار */}
+            <div
+              className="absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-brand-600 shadow-sm"
+              aria-hidden
+            />
+            {/* الخطوات الخمس: أول خطوة من اليمين، تتناوب فوق/تحت الخط */}
+            <div className="relative flex justify-between items-center gap-2 md:gap-4">
+              {[
+                {
+                  num: 1,
+                  label: 'اختر نوع الكفالة',
+                  desc: 'تصفح الخدمات المتاحة التي تريد دعمها',
+                  above: true,
+                },
+                {
+                  num: 2,
+                  label: 'مراجعة واعتماد',
+                  desc: 'يقوم الفريق المسؤول بمراجعة طلبك واعتماده خلال 24 ساعة',
+                  above: false,
+                },
+                {
+                  num: 3,
+                  label: 'التحضير والتوصيل',
+                  desc: 'يتم تكليف أفضل المتطوعين لتحضير وتوصيل الخدمة للمستفيدين',
+                  above: true,
+                },
+                {
+                  num: 4,
+                  label: 'التوثيق الميداني',
+                  desc: 'يقوم المندوب بتوثيق عملية التسليم بالصور والفيديوهات',
+                  above: false,
+                },
+                {
+                  num: 5,
+                  label: 'تقرير التنفيذ',
+                  desc: 'تستلم تقريراً مفصلاً عن التنفيذ مع الصور والتوثيق كامل',
+                  above: true,
+                },
+              ].map(({ num, label, desc, above }) => (
+                <div
+                  key={num}
+                  className="flex flex-1 flex-col items-center justify-center min-w-0"
+                >
+                  {above ? (
+                    <div className="text-center px-0.5 mb-2 space-y-0.5">
+                      <p className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
+                        {num}. {label}
+                      </p>
+                      <p className="text-[10px] md:text-xs text-gray-500 leading-snug max-w-[140px] md:max-w-[160px] mx-auto">
+                        {desc}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="h-16 md:h-20 shrink-0" aria-hidden />
+                  )}
+                  <span
+                    className="shrink-0 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-brand-600 bg-white shadow-sm ring-2 ring-white"
+                    aria-hidden
+                  />
+                  {above ? (
+                    <span className="h-16 md:h-20 shrink-0" aria-hidden />
+                  ) : (
+                    <div className="text-center px-0.5 mt-2 space-y-0.5">
+                      <p className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
+                        {num}. {label}
+                      </p>
+                      <p className="text-[10px] md:text-xs text-gray-500 leading-snug max-w-[140px] md:max-w-[160px] mx-auto">
+                        {desc}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Services Grid */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
