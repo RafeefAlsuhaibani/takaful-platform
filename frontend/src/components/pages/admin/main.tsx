@@ -1,9 +1,12 @@
 import AdminLayout from "../../layout/AdminLayout";
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch } from "react-icons/fi";
-import { Eye, EyeOff, ChevronLeft, Users, SquarePen, FolderOpen, FileText, HandCoins, ChevronDown, ChevronUp, CalendarDays, MapPin, User, Clock, AlertTriangle, X } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft, Users, SquarePen, FolderOpen, FileText, HandCoins, ChevronDown, ChevronUp, CalendarDays, MapPin, User, Clock, AlertTriangle, X, Check, Upload } from "lucide-react";
 import Modal from "../../ui/Modal";
+import { useDashboardSettings } from "../../../contexts/useDashboardSettings";
+
+const DEBUG_DASHBOARD_SETTINGS = true;
 
 
 interface Project {
@@ -16,6 +19,15 @@ interface Project {
     supervisor?: string;
     tags?: string[];
 }
+
+type EditableDashboardKey =
+    | 'showDashboard'
+    | 'showKPIs'
+    | 'showDonut'
+    | 'showVolunteerBars'
+    | 'showTopVolunteers';
+
+type DraftDashboardSettings = Record<EditableDashboardKey, boolean>;
 
 
 // Project Status Dropdown Component
@@ -267,6 +279,57 @@ export default function AdminMain() {
         "المشاريع المنتهية": 2
     });
 
+    // Dashboard Settings from Context
+    const { settings: dashboardSettings, updateSetting } = useDashboardSettings();
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [draftSettings, setDraftSettings] = useState<DraftDashboardSettings>({
+        showDashboard: dashboardSettings.showDashboard,
+        showKPIs: dashboardSettings.showKPIs,
+        showDonut: dashboardSettings.showDonut,
+        showVolunteerBars: dashboardSettings.showVolunteerBars,
+        showTopVolunteers: dashboardSettings.showTopVolunteers,
+    });
+    const excelInputRef = useRef<HTMLInputElement | null>(null);
+
+    const settingItems: Array<{ key: EditableDashboardKey; label: string }> = [
+        { key: 'showDashboard', label: 'إحصائية المتطوعين' },
+        { key: 'showKPIs', label: 'عدد الساعات التطوعية / قيمة إسهام المتطوع' },
+        { key: 'showDonut', label: 'إحصائية المتطوعين / مجموع الساعات التطوعية للإدارات' },
+        { key: 'showVolunteerBars', label: 'عدد المتطوعين' },
+        { key: 'showTopVolunteers', label: 'أفضل المتطوعين' },
+    ];
+
+    useEffect(() => {
+        if (!isEditing) {
+            setDraftSettings({
+                showDashboard: dashboardSettings.showDashboard,
+                showKPIs: dashboardSettings.showKPIs,
+                showDonut: dashboardSettings.showDonut,
+                showVolunteerBars: dashboardSettings.showVolunteerBars,
+                showTopVolunteers: dashboardSettings.showTopVolunteers,
+            });
+        }
+    }, [dashboardSettings, isEditing]);
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setIsUploading(true);
+            setUploadedFile(file);
+            // Simulate success notification
+            const tempMsg = document.createElement('div');
+            tempMsg.textContent = 'تم رفع الملف بنجاح';
+            tempMsg.className = 'fixed top-4 right-4 bg-brand-700 text-white px-6 py-3 rounded-lg shadow-lg z-50 font-[Cairo]';
+            document.body.appendChild(tempMsg);
+            setTimeout(() => {
+                tempMsg.remove();
+                setIsUploading(false);
+            }, 1200);
+        }
+    };
+
     const stats = [
         {
             value: "14,500",
@@ -507,6 +570,25 @@ export default function AdminMain() {
         alert('تم حفظ التعديلات بنجاح!');
         setShowEditModal(false);
     };
+    const handleSaveDashboardSettings = () => {
+        settingItems.forEach(({ key }) => {
+            if (dashboardSettings[key] !== draftSettings[key]) {
+                updateSetting(key, draftSettings[key]);
+            }
+        });
+        setIsEditing(false);
+    };
+
+    const handleCancelDashboardSettings = () => {
+        setDraftSettings({
+            showDashboard: dashboardSettings.showDashboard,
+            showKPIs: dashboardSettings.showKPIs,
+            showDonut: dashboardSettings.showDonut,
+            showVolunteerBars: dashboardSettings.showVolunteerBars,
+            showTopVolunteers: dashboardSettings.showTopVolunteers,
+        });
+        setIsEditing(false);
+    };
 
     return (
         <AdminLayout>
@@ -565,6 +647,119 @@ export default function AdminMain() {
                                 )}
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Dashboard Management Card */}
+                <div className="flex justify-center mb-4 sm:mb-5 md:mb-6 px-4">
+                    <div className="w-full max-w-5xl rounded-2xl bg-[#F3E3E3] p-4 sm:p-5 md:p-6 shadow-xl border border-[#f0d8c2]" dir="rtl">
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                            <div className="text-right">
+                                <h3 className="text-xl font-bold text-[#6F1A28] font-[Cairo]">إدارة لوحة الإحصائيات</h3>
+                                <p className="mt-1 text-sm text-[#6F1A28]/85 font-[Cairo]">التحكم في العناصر المعروضة على الصفحة الرئيسية</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={isEditing ? handleSaveDashboardSettings : () => setIsEditing(true)}
+                                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                                    aria-label={isEditing ? "حفظ إعدادات اللوحة" : "تعديل إعدادات اللوحة"}
+                                >
+                                    {isEditing ? (
+                                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-700" />
+                                    ) : (
+                                        <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                    )}
+                                </button>
+                                {isEditing && (
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelDashboardSettings}
+                                        className="px-3 py-1.5 rounded-lg text-sm font-[Cairo] text-[#86676A] border border-[#86676A]/50 hover:bg-white/50 transition-colors"
+                                    >
+                                        إلغاء
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <section className="rounded-xl bg-white/70 border border-[#e7d3ce] p-4">
+                            <h4 className="text-base font-bold text-[#6F1A28] font-[Cairo] mb-4">العناصر المعروضة</h4>
+                            <div className="mb-4 rounded-lg border border-[#efdeda] bg-white px-3 py-2.5">
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-[#291613] text-sm font-[Cairo]">السنة الحالية</span>
+                                    <span className="text-[#291613] font-semibold font-[Cairo]">{new Date().getFullYear()}</span>
+                                </div>
+                                <p className="mt-2 text-xs text-[#6F1A28]/80 font-[Cairo] text-right">
+                                    ملاحظة: السنة تتحدث تلقائيًا حسب السنة الحالية.
+                                </p>
+                            </div>
+                            <ul className="space-y-2">
+                                {settingItems.map((item) => (
+                                    <li key={item.key} className="rounded-lg border border-[#efdeda] bg-white px-3 py-2.5">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="text-[#291613] text-sm font-[Cairo] text-right">{item.label}</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={draftSettings[item.key]}
+                                                    onChange={(e) => {
+                                                        const checked = e.target.checked;
+                                                        setDraftSettings((prev) => ({ ...prev, [item.key]: checked }));
+                                                    }}
+                                                    className="h-4 w-4 rounded border-gray-300 text-[#6F1A28] focus:ring-[#6F1A28]"
+                                                    aria-label={`تعديل ${item.label}`}
+                                                />
+                                            ) : (
+                                                <span
+                                                    className={`inline-flex items-center justify-center rounded-md p-1 ${dashboardSettings[item.key] ? 'bg-green-50' : 'bg-red-50'}`}
+                                                    aria-label={dashboardSettings[item.key] ? `${item.label} مفعلة` : `${item.label} مخفية`}
+                                                >
+                                                    {dashboardSettings[item.key] ? (
+                                                        <Check size={18} className="text-green-700" />
+                                                    ) : (
+                                                        <X size={18} className="text-red-700" />
+                                                    )}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+
+                        <div className="mt-4 border-t border-[#e6d7d4] pt-4">
+                            <input
+                                ref={excelInputRef}
+                                type="file"
+                                accept=".xlsx,.xls"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                                id="excel-upload"
+                                aria-label="رفع ملف إحصائيات"
+                            />
+                            <div className="mb-2 flex items-center justify-between gap-3">
+                                <h4 className="text-base font-bold text-[#6F1A28] font-[Cairo]">البيانات</h4>
+                                <button
+                                    type="button"
+                                    onClick={() => excelInputRef.current?.click()}
+                                    disabled={isUploading}
+                                    className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold font-[Cairo] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ab686f] focus-visible:ring-offset-2 ${isUploading ? 'bg-[#ab686f]/70 cursor-not-allowed' : 'bg-[#ab686f] hover:bg-[#95545b] shadow-sm hover:shadow-md'}`}
+                                >
+                                    <Upload className="w-4 h-4" />
+                                    <span>{isUploading ? 'جاري الرفع...' : 'رفع ملف إحصائيات (Excel)'}</span>
+                                </button>
+                            </div>
+                            <p className="text-xs text-[#6F1A28]/80 font-[Cairo] text-right">
+                                ارفع ملف .xlsx لتحديث الأرقام المعروضة في الصفحة الرئيسية.
+                            </p>
+                            {uploadedFile && (
+                                <div className="mt-2 flex items-center gap-2">
+                                    <span className="text-sm text-[#291613] font-[Cairo]">الملف المختار:</span>
+                                    <span className="text-sm font-medium text-[#6F1A28] font-[Cairo]">{uploadedFile.name}</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 

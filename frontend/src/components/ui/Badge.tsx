@@ -2,20 +2,24 @@ import type { ReactNode } from 'react';
 
 interface BadgeProps {
   children: ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'info';
+  variant?: 'primary' | 'accent' | 'neutral' | 'default' | 'success' | 'warning' | 'info';
   className?: string;
 }
 
-export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
-  const baseClasses = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium';
-  
+export default function Badge({ children, variant = 'neutral', className = '' }: BadgeProps) {
+  const baseClasses = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1';
+
   const variantClasses = {
-    default: 'bg-gray-100 text-gray-800 border border-gray-200',
-    success: 'bg-green-100 text-green-800 border border-green-200',
-    warning: 'bg-amber-50 text-amber-800 border border-amber-200',
-    info: 'bg-blue-100 text-blue-800 border border-blue-200'
+    primary: 'bg-rose-50 text-rose-800 ring-rose-200',
+    accent: 'bg-amber-50 text-amber-800 ring-amber-200',
+    neutral: 'bg-slate-50 text-slate-700 ring-slate-200',
+    // Backward-compatible aliases for existing pages
+    default: 'bg-slate-50 text-slate-700 ring-slate-200',
+    success: 'bg-rose-50 text-rose-800 ring-rose-200',
+    warning: 'bg-amber-50 text-amber-800 ring-amber-200',
+    info: 'bg-slate-50 text-slate-700 ring-slate-200',
   };
-  
+
   return (
     <span className={`${baseClasses} ${variantClasses[variant]} ${className}`}>
       {children}

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { DashboardSettingsProvider } from './contexts/DashboardSettingsContext';
 
 // Layouts
 import Navbar from './components/layout/Navbar';
@@ -17,6 +18,7 @@ import SignUp from './components/pages/Auth/SignUp';
 import AdminSignIn from './components/pages/admin/AdminSignIn';
 import Suggest from './components/pages/Suggest';
 import About from './components/pages/About';
+import WaterSupplyRequestPage from './components/pages/WaterSupplyRequestPage';
 
 // User Pages
 import UserMain from './components/pages/user/Main';
@@ -52,6 +54,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/water-supply" element={<WaterSupplyRequestPage />} />
           <Route path="/volunteers" element={<Volunteers />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
@@ -83,12 +86,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </ToastProvider>
-    </AuthProvider>
+    <DashboardSettingsProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </ToastProvider>
+      </AuthProvider>
+    </DashboardSettingsProvider>
   );
 }

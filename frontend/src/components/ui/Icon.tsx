@@ -29,7 +29,8 @@ import {
   Info,
   CheckCircle2 ,
   Rocket,
-  ClipboardList
+  ClipboardList,
+  Clock
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -72,6 +73,7 @@ const iconMap: Record<string, LucideIcon> = {
   CheckCircle2,
   Rocket,
   ClipboardList,
+  Clock,
 };
 
 export default function Icon({ name, className = '', size = 24, style }: IconProps) {
