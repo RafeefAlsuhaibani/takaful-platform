@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import AdminLayout from "../../layout/AdminLayout";
 import { FiSearch } from "react-icons/fi";
 import { MapPin, Mail, Phone, Star, Check, X } from 'lucide-react';
 
@@ -94,11 +93,10 @@ export default function VolunteerRequests() {
   );
 
     return (
-        <AdminLayout>
       <div className="h-full">
         {/* Search Bar */}
         <div dir="ltr" className="flex justify-start mb-6">
-          <div className="relative w-[321px] h-[42px]">
+          <div className="relative w-full max-w-[321px] h-[42px]">
             <div className="absolute inset-0 bg-[#faf6f76b] rounded-[20px] shadow-[inset_0px_0px_8px_#f3e3e3e0,0px_4px_15px_#8d2e4682]" />
             <input
               type="text"
@@ -115,8 +113,8 @@ export default function VolunteerRequests() {
 
         {/* Title Banner */}
         <div className="flex justify-center mb-8">
-          <div className="bg-[#f3e3e3] rounded-[19px] px-12 py-4 border border-[#e0cfd4] shadow-[0px_3px_25px_#8d2e4673] w-fit min-w-[300px]">
-            <h1 className="text-3xl font-bold text-[#2e2b2c] text-center font-[Cairo]">طلبات التطوع</h1>
+          <div className="bg-[#f3e3e3] rounded-[19px] px-6 sm:px-12 py-4 border border-[#e0cfd4] shadow-[0px_3px_25px_#8d2e4673] w-full max-w-[460px]">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#2e2b2c] text-center font-[Cairo]">طلبات التطوع</h1>
           </div>
         </div>
 
@@ -195,7 +193,7 @@ export default function VolunteerRequests() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => handleAccept(volunteer.id)}
                   className="flex-1 bg-[#8D2E46] hover:bg-[#6B1E2A] text-white font-medium py-2.5 rounded-xl transition-colors duration-200"
@@ -220,6 +218,5 @@ export default function VolunteerRequests() {
           </div>
         )}
       </div>
-        </AdminLayout>
     );
 }

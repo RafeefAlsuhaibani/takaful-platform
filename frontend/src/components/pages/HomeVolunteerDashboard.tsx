@@ -2,6 +2,7 @@ import Icon from '../ui/Icon';
 import Card from '../ui/Card';
 import DonutChart from '../ui/DonutChart';
 import { useDashboardSettings } from '../../contexts/useDashboardSettings';
+import { useEffect, useState } from 'react';
 
 const DEBUG_DASHBOARD_SETTINGS = true;
 
@@ -26,6 +27,21 @@ export default function HomeVolunteerDashboard() {
   const { settings } = useDashboardSettings();
   const currentYear = settings?.year ?? new Date().getFullYear();
   const totalVolunteers = STATIC_DATA.volunteerCounts.new + STATIC_DATA.volunteerCounts.repeat;
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 640px)').matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 640px)');
+    const onChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    setIsMobile(media.matches);
+    media.addEventListener('change', onChange);
+
+    return () => media.removeEventListener('change', onChange);
+  }, []);
 
   if (DEBUG_DASHBOARD_SETTINGS) console.log('[HomeVolunteerDashboard] render with settings:', settings);
 
@@ -43,8 +59,8 @@ export default function HomeVolunteerDashboard() {
           <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
             <Card className="h-full rounded-2xl border border-[#eadfda] bg-[#fffdfa] p-5 shadow-[0_2px_12px_rgba(107,31,43,0.06)]">
               <div className="flex flex-col items-center text-center">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ece8]">
-                  <Icon name="Clock" className="text-[#6B1F2B]" size={20} />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#DFC775]">
+                  <Icon name="Clock" className="text-white" size={20} />
                 </div>
                 <h3 className="text-base font-semibold text-[#5b3b34]">عدد الساعات التطوعية</h3>
                 <p className="mt-1 text-xs text-[#8d726b]">مجموع ساعات التطوع</p>
@@ -55,8 +71,8 @@ export default function HomeVolunteerDashboard() {
 
             <Card className="h-full rounded-2xl border border-[#eadfda] bg-[#fffdfa] p-5 shadow-[0_2px_12px_rgba(107,31,43,0.06)]">
               <div className="flex flex-col items-center text-center">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ece8]">
-                  <Icon name="Heart" className="text-[#6B1F2B]" size={20} />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#DFC775]">
+                  <Icon name="Heart" className="text-white" size={20} />
                 </div>
                 <h3 className="text-base font-semibold text-[#5b3b34]">قيمة إسهام المتطوع</h3>
                 <p className="mt-1 text-xs text-[#8d726b]">قيمة الأثر الإجمالي</p>
@@ -67,8 +83,8 @@ export default function HomeVolunteerDashboard() {
 
             <Card className="h-full rounded-2xl border border-[#eadfda] bg-[#fffdfa] p-5 shadow-[0_2px_12px_rgba(107,31,43,0.06)]">
               <div className="flex flex-col items-center text-center">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#f6ece8]">
-                  <Icon name="Users" className="text-[#6B1F2B]" size={20} />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#DFC775]">
+                  <Icon name="Users" className="text-white" size={20} />
                 </div>
                 <h3 className="text-base font-semibold text-[#5b3b34]">عدد المتطوعين</h3>
                 <p className="mt-1 text-xs text-[#8d726b]">إجمالي المتطوعين الحاليين</p>
@@ -89,7 +105,7 @@ export default function HomeVolunteerDashboard() {
               </div>
               <DonutChart
                 total={100}
-                size={260}
+                size={isMobile ? 210 : 260}
                 strokeWidth={22}
                 segments={[
                   { label: 'إدارة أ', value: 40, color: '#6B1F2B' },

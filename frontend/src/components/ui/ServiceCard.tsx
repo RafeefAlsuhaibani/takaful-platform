@@ -6,10 +6,9 @@ import Badge from './Badge';
 interface ServiceCardProps {
   service: Service;
   onDetails: (service: Service) => void;
-  onRegister: (service: Service) => void;
 }
 
-export default function ServiceCard({ service, onDetails, onRegister }: ServiceCardProps) {
+export default function ServiceCard({ service, onDetails }: ServiceCardProps) {
   const getStatusVariant = (status: string) => {
     switch (status) {
       case 'متاحة':
@@ -84,14 +83,6 @@ export default function ServiceCard({ service, onDetails, onRegister }: ServiceC
         تفاصيل الخدمة
       </button>
 
-      {/* Mobile Register Button - Always Visible on Mobile */}
-      <button
-        onClick={() => onRegister(service)}
-        className="md:hidden w-full mt-2 rounded-full border-2 border-[#DFC775] text-[#DFC775] bg-white hover:bg-[#FFF5D6] px-4 py-1.5 font-semibold text-sm transition-all duration-200 focus-visible:ring-2 ring-brand-600 ring-offset-2"
-        aria-haspopup="dialog"
-      >
-        سجّل في الخدمة
-      </button>
     </div>
   );
 }

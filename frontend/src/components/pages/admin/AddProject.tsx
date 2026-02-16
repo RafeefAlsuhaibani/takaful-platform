@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import AdminLayout from "../../layout/AdminLayout";
 import { FiSearch } from "react-icons/fi";
 import { FileText, Calendar, Save, X } from 'lucide-react';
 import Button from '../../ui/Button';
@@ -137,11 +136,10 @@ export default function AddProject() {
   };
 
   return (
-    <AdminLayout>
       <div className="h-full">
         {/* Search Bar */}
         <div dir="ltr" className="flex justify-start mb-6">
-          <div className="relative w-[321px] h-[42px]">
+          <div className="relative w-full max-w-[321px] h-[42px]">
             <div className="absolute inset-0 bg-[#faf6f76b] rounded-[20px] shadow-[inset_0px_0px_8px_#f3e3e3e0,0px_4px_15px_#8d2e4682]" />
             <input
               type="text"
@@ -158,8 +156,8 @@ export default function AddProject() {
 
         {/* Title Banner */}
         <div className="flex justify-center mb-8">
-          <div className="bg-[#f3e3e3] rounded-[19px] px-12 py-4 border border-[#e0cfd4] shadow-[0px_3px_25px_#8d2e4673] w-fit min-w-[300px]">
-            <h1 className="text-3xl font-bold text-[#2e2b2c] text-center font-[Cairo]">بيانات اضافة مشروع</h1>
+          <div className="bg-[#f3e3e3] rounded-[19px] px-6 sm:px-12 py-4 border border-[#e0cfd4] shadow-[0px_3px_25px_#8d2e4673] w-full max-w-[520px]">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#2e2b2c] text-center font-[Cairo]">بيانات اضافة مشروع</h1>
           </div>
         </div>
 
@@ -429,7 +427,7 @@ export default function AddProject() {
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               type="submit"
               variant="primary"
@@ -468,6 +466,5 @@ export default function AddProject() {
           </div>
         </form>
       </div>
-    </AdminLayout>
   );
 }

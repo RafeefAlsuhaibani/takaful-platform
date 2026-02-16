@@ -1,4 +1,3 @@
-import SidebarLayout from '../../ui/Sidebar';
 import { useMemo, useState, useEffect } from "react";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { API_BASE_URL } from '../../../config';
@@ -476,7 +475,6 @@ export default function Tasks() {
     };
 
     return (
-        <SidebarLayout>
             <div className="h-full w-full overflow-auto">
                 {error && (
                     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50" style={{ direction: "rtl" }}>
@@ -582,9 +580,9 @@ export default function Tasks() {
                         </div>
 
                         <div className="order-2 lg:order-1 w-full">
-                            <div className="w-full border-b-0 border-[#C49FA3] bg-gradient-to-l from-[#e3d1d8] via-[#f5e6d3] to-[#fef3c7] rounded-t-2xl flex shadow-lg">
+                            <div className="w-full border-b-0 border-[#C49FA3] bg-gradient-to-l from-[#e3d1d8] via-[#f5e6d3] to-[#fef3c7] rounded-t-2xl flex shadow-lg overflow-x-auto">
                                 {tabs.map((tab) => (
-                                    <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 whitespace-nowrap py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium transition-all duration-200 ${activeTab === tab ? `bg-white text-[#291613] border-x-4 border-t-4 border-[#C49FA3] rounded-t-2xl shadow-sm` : `text-[#7f6f6f] border-b-4 border-[#C49FA3]`}`}>{tab}</button>
+                                    <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 shrink-0 min-w-max whitespace-nowrap py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium transition-all duration-200 ${activeTab === tab ? `bg-white text-[#291613] border-x-4 border-t-4 border-[#C49FA3] rounded-t-2xl shadow-sm` : `text-[#7f6f6f] border-b-4 border-[#C49FA3]`}`}>{tab}</button>
                                 ))}
                             </div>
                             <div className="w-full bg-white rounded-b-2xl border-4 border-[#C49FA3] border-t-0 p-4 sm:p-6 space-y-6">
@@ -633,6 +631,5 @@ export default function Tasks() {
                     </div>
                 </div>
             </div>
-        </SidebarLayout>
     );
 }
