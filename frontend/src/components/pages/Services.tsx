@@ -138,6 +138,99 @@ function Services() {
         </div>
       </section>
 
+      {/* خطوات الخدمة — العميل يعرف الخطوات قبل التقديم */}
+      <section className="py-12 md:py-16 bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="relative" dir="rtl">
+            {/* الخط الأفقي العنابي من اليمين لليسار */}
+            <div
+              className="absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-brand-600 shadow-sm"
+              aria-hidden
+            />
+            {/* الخطوات الخمس: أول خطوة من اليمين، تتناوب فوق/تحت الخط */}
+            <div className="relative flex justify-between items-center gap-2 md:gap-4">
+              {[
+                {
+                  num: 1,
+                  label: 'اختر نوع الكفالة',
+                  desc: 'تصفح الخدمات المتاحة التي تريد دعمها',
+                  icon: 'Lightbulb',
+                  above: true,
+                },
+                {
+                  num: 2,
+                  label: 'مراجعة واعتماد',
+                  desc: 'يقوم الفريق المسؤول بمراجعة طلبك واعتماده خلال 24 ساعة',
+                  icon: 'ClipboardList',
+                  above: false,
+                },
+                {
+                  num: 3,
+                  label: 'التحضير والتوصيل',
+                  desc: 'يتم تكليف أفضل المتطوعين لتحضير وتوصيل الخدمة للمستفيدين',
+                  icon: 'HandHeart',
+                  above: true,
+                },
+                {
+                  num: 4,
+                  label: 'التوثيق الميداني',
+                  desc: 'يقوم المندوب بتوثيق عملية التسليم بالصور والفيديوهات',
+                  icon: 'Camera',
+                  above: false,
+                },
+                {
+                  num: 5,
+                  label: 'تقرير التنفيذ',
+                  desc: 'تستلم تقريراً مفصلاً عن التنفيذ مع الصور والتوثيق كامل',
+                  icon: 'CheckCircle2',
+                  above: true,
+                },
+              ].map(({ num, label, desc, icon, above }) => (
+                <div
+                  key={num}
+                  className="flex flex-1 flex-col items-center justify-center min-w-0"
+                >
+                  {above ? (
+                    <div className="text-center px-0.5 mb-2 space-y-0.5">
+                      <p className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
+                        {num}. {label}
+                      </p>
+                      <p className="text-[10px] md:text-xs text-gray-500 leading-snug max-w-[140px] md:max-w-[160px] mx-auto">
+                        {desc}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="h-20 md:h-24 shrink-0" aria-hidden />
+                  )}
+                  <div
+                    className="shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-brand-600 bg-white shadow-md ring-2 ring-white flex items-center justify-center"
+                    aria-hidden
+                  >
+                    <Icon
+                      name={icon}
+                      size={18}
+                      className="text-brand-600"
+                    />
+                  </div>
+                  {above ? (
+                    <span className="h-20 md:h-24 shrink-0" aria-hidden />
+                  ) : (
+                    <div className="text-center px-0.5 mt-2 space-y-0.5">
+                      <p className="text-xs md:text-sm font-bold text-gray-900 leading-tight">
+                        {num}. {label}
+                      </p>
+                      <p className="text-[10px] md:text-xs text-gray-500 leading-snug max-w-[140px] md:max-w-[160px] mx-auto">
+                        {desc}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Filter Chips */}
       <section className="py-8 bg-white">
         <div className="max-w-6xl mx-auto px-4">
