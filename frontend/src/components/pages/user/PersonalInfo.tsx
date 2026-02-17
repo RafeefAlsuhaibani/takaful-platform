@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import SidebarLayout from '../../ui/Sidebar';
 import { Edit, Search, Check, X, Mail } from 'lucide-react';
 
 import { useEffect } from "react";
@@ -125,7 +124,6 @@ export default function PersonalInfo() {
   };
 
   return (
-    <SidebarLayout>
       <div className="h-full">
         {/* Search Bar and Quote - Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
@@ -437,6 +435,5 @@ export default function PersonalInfo() {
 </div>
 
       </div>
-    </SidebarLayout>
   );
 }

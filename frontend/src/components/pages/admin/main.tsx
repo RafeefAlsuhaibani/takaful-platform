@@ -1,9 +1,11 @@
-import AdminLayout from "../../layout/AdminLayout";
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch } from "react-icons/fi";
-import { Eye, EyeOff, ChevronLeft, Users, SquarePen, FolderOpen, FileText, HandCoins, ChevronDown, ChevronUp, CalendarDays, MapPin, User, Clock, AlertTriangle, X } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft, Users, SquarePen, FolderOpen, FileText, HandCoins, ChevronDown, ChevronUp, CalendarDays, MapPin, User, Clock, AlertTriangle, X, Check, Upload } from "lucide-react";
 import Modal from "../../ui/Modal";
+import { useDashboardSettings } from "../../../contexts/useDashboardSettings";
+
+const DEBUG_DASHBOARD_SETTINGS = true;
 
 
 interface Project {
@@ -17,9 +19,26 @@ interface Project {
     tags?: string[];
 }
 
+type EditableDashboardKey =
+    | 'showDashboard'
+    | 'showKPIs'
+    | 'showDonut'
+    | 'showVolunteerBars'
+    | 'showTopVolunteers';
+
+type DraftDashboardSettings = Record<EditableDashboardKey, boolean>;
+
 
 // Project Status Dropdown Component
-function ProjectStatusDropdown({ currentStatus, onStatusChange }: { currentStatus: string; onStatusChange: (status: string) => void }) {
+function ProjectStatusDropdown({
+    currentStatus,
+    onStatusChange,
+    compact = false,
+}: {
+    currentStatus: string;
+    onStatusChange: (status: string) => void;
+    compact?: boolean;
+}) {
     const [isOpen, setIsOpen] = useState(false);
 
     const statuses = [
@@ -30,19 +49,23 @@ function ProjectStatusDropdown({ currentStatus, onStatusChange }: { currentStatu
     ];
 
     return (
-        <div className="relative" dir="rtl">
+        <div className={compact ? "relative w-auto max-w-[160px] shrink-0" : "relative w-full md:w-auto max-w-[260px]"} dir="rtl">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border-2 border-[#6F1A28] rounded-[8px] sm:rounded-[8px] md:rounded-[20px] min-w-[140px] sm:min-w-[160px] md:min-w-[180px] shadow-sm hover:shadow-md transition-shadow"
+                className={
+                    compact
+                        ? "w-auto max-w-[160px] flex items-center justify-between gap-2 px-2.5 py-1.5 bg-white border border-[#6F1A28] rounded-lg min-w-0 shadow-sm hover:shadow-md transition-shadow"
+                        : "w-full md:w-auto flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border-2 border-[#6F1A28] rounded-[8px] sm:rounded-[8px] md:rounded-[20px] min-w-[140px] sm:min-w-[160px] md:min-w-[180px] shadow-sm hover:shadow-md transition-shadow"
+                }
                 aria-label="اختيار حالة المشروع"
             >
-                <span className="text-[#6F1A28] font-bold text-[11px] sm:text-[12px] md:text-[13px] font-[Cairo]">
+                <span className={compact ? "text-[#6F1A28] font-semibold text-xs font-[Cairo] truncate" : "text-[#6F1A28] font-bold text-[11px] sm:text-[12px] md:text-[13px] font-[Cairo]"}>
                     {currentStatus}
                 </span>
                 {isOpen ? (
-                    <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-[#6F1A28]" />
+                    <ChevronUp className={compact ? "w-3.5 h-3.5 text-[#6F1A28]" : "w-4 h-4 sm:w-5 sm:h-5 text-[#6F1A28]"} />
                 ) : (
-                    <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-[#6F1A28]" />
+                    <ChevronDown className={compact ? "w-3.5 h-3.5 text-[#6F1A28]" : "w-4 h-4 sm:w-5 sm:h-5 text-[#6F1A28]"} />
                 )}
             </button>
 
@@ -266,6 +289,57 @@ export default function AdminMain() {
         "المشاريع النشطة": 2,
         "المشاريع المنتهية": 2
     });
+
+    // Dashboard Settings from Context
+    const { settings: dashboardSettings, updateSetting } = useDashboardSettings();
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [draftSettings, setDraftSettings] = useState<DraftDashboardSettings>({
+        showDashboard: dashboardSettings.showDashboard,
+        showKPIs: dashboardSettings.showKPIs,
+        showDonut: dashboardSettings.showDonut,
+        showVolunteerBars: dashboardSettings.showVolunteerBars,
+        showTopVolunteers: dashboardSettings.showTopVolunteers,
+    });
+    const excelInputRef = useRef<HTMLInputElement | null>(null);
+
+    const settingItems: Array<{ key: EditableDashboardKey; label: string }> = [
+        { key: 'showDashboard', label: 'إحصائية المتطوعين' },
+        { key: 'showKPIs', label: 'عدد الساعات التطوعية / قيمة إسهام المتطوع' },
+        { key: 'showDonut', label: 'إحصائية المتطوعين / مجموع الساعات التطوعية للإدارات' },
+        { key: 'showVolunteerBars', label: 'عدد المتطوعين' },
+        { key: 'showTopVolunteers', label: 'أفضل المتطوعين' },
+    ];
+
+    useEffect(() => {
+        if (!isEditing) {
+            setDraftSettings({
+                showDashboard: dashboardSettings.showDashboard,
+                showKPIs: dashboardSettings.showKPIs,
+                showDonut: dashboardSettings.showDonut,
+                showVolunteerBars: dashboardSettings.showVolunteerBars,
+                showTopVolunteers: dashboardSettings.showTopVolunteers,
+            });
+        }
+    }, [dashboardSettings, isEditing]);
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setIsUploading(true);
+            setUploadedFile(file);
+            // Simulate success notification
+            const tempMsg = document.createElement('div');
+            tempMsg.textContent = 'تم رفع الملف بنجاح';
+            tempMsg.className = 'fixed top-4 right-4 bg-brand-700 text-white px-6 py-3 rounded-lg shadow-lg z-50 font-[Cairo]';
+            document.body.appendChild(tempMsg);
+            setTimeout(() => {
+                tempMsg.remove();
+                setIsUploading(false);
+            }, 1200);
+        }
+    };
 
     const stats = [
         {
@@ -502,14 +576,41 @@ export default function AdminMain() {
 
     const [activeProject, setActiveProject] = useState<Project>(projects[0]);
     const [isProjectHidden, setIsProjectHidden] = useState(false);
+    const projectDescriptionPoints = useMemo(
+        () =>
+            activeProject.description
+                .split(/[.،]/)
+                .map((part) => part.trim())
+                .filter((part) => part.length > 0),
+        [activeProject.description]
+    );
 
     const handleSaveEdit = () => {
         alert('تم حفظ التعديلات بنجاح!');
         setShowEditModal(false);
     };
+    const handleSaveDashboardSettings = () => {
+        settingItems.forEach(({ key }) => {
+            if (dashboardSettings[key] !== draftSettings[key]) {
+                updateSetting(key, draftSettings[key]);
+            }
+        });
+        setIsEditing(false);
+    };
+
+    const handleCancelDashboardSettings = () => {
+        setDraftSettings({
+            showDashboard: dashboardSettings.showDashboard,
+            showKPIs: dashboardSettings.showKPIs,
+            showDonut: dashboardSettings.showDonut,
+            showVolunteerBars: dashboardSettings.showVolunteerBars,
+            showTopVolunteers: dashboardSettings.showTopVolunteers,
+        });
+        setIsEditing(false);
+    };
 
     return (
-        <AdminLayout>
+        <>
             <div className="h-full">
                 {/* Search Bar */}
                 <div dir="ltr" className="flex justify-start mb-5 sm:mb-6">
@@ -538,7 +639,7 @@ export default function AdminMain() {
                     </div>
 
                     <div className="flex justify-center mb-4">
-                        <div className="w-[700px] h-[2px] bg-[#B98A91] rounded-full shadow-[0_3px_8px_rgba(185,138,145,0.35)]"></div>
+                        <div className="w-full max-w-[700px] h-[2px] bg-[#B98A91] rounded-full shadow-[0_3px_8px_rgba(185,138,145,0.35)]"></div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
@@ -565,6 +666,119 @@ export default function AdminMain() {
                                 )}
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Dashboard Management Card */}
+                <div className="flex justify-center mb-4 sm:mb-5 md:mb-6 px-4">
+                    <div className="w-full max-w-5xl rounded-2xl bg-[#F3E3E3] p-4 sm:p-5 md:p-6 shadow-xl border border-[#f0d8c2]" dir="rtl">
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                            <div className="text-right">
+                                <h3 className="text-xl font-bold text-[#6F1A28] font-[Cairo]">إدارة لوحة الإحصائيات</h3>
+                                <p className="mt-1 text-sm text-[#6F1A28]/85 font-[Cairo]">التحكم في العناصر المعروضة على الصفحة الرئيسية</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={isEditing ? handleSaveDashboardSettings : () => setIsEditing(true)}
+                                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                                    aria-label={isEditing ? "حفظ إعدادات اللوحة" : "تعديل إعدادات اللوحة"}
+                                >
+                                    {isEditing ? (
+                                        <Check className="w-4 h-4 sm:w-5 sm:h-5 text-green-700" />
+                                    ) : (
+                                        <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                    )}
+                                </button>
+                                {isEditing && (
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelDashboardSettings}
+                                        className="px-3 py-1.5 rounded-lg text-sm font-[Cairo] text-[#86676A] border border-[#86676A]/50 hover:bg-white/50 transition-colors"
+                                    >
+                                        إلغاء
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <section className="rounded-xl bg-white/70 border border-[#e7d3ce] p-4">
+                            <h4 className="text-base font-bold text-[#6F1A28] font-[Cairo] mb-4">العناصر المعروضة</h4>
+                            <div className="mb-4 rounded-lg border border-[#efdeda] bg-white px-3 py-2.5">
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-[#291613] text-sm font-[Cairo]">السنة الحالية</span>
+                                    <span className="text-[#291613] font-semibold font-[Cairo]">{new Date().getFullYear()}</span>
+                                </div>
+                                <p className="mt-2 text-xs text-[#6F1A28]/80 font-[Cairo] text-right">
+                                    ملاحظة: السنة تتحدث تلقائيًا حسب السنة الحالية.
+                                </p>
+                            </div>
+                            <ul className="space-y-2">
+                                {settingItems.map((item) => (
+                                    <li key={item.key} className="rounded-lg border border-[#efdeda] bg-white px-3 py-2.5">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <span className="text-[#291613] text-sm font-[Cairo] text-right">{item.label}</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={draftSettings[item.key]}
+                                                    onChange={(e) => {
+                                                        const checked = e.target.checked;
+                                                        setDraftSettings((prev) => ({ ...prev, [item.key]: checked }));
+                                                    }}
+                                                    className="h-4 w-4 rounded border-gray-300 text-[#6F1A28] focus:ring-[#6F1A28]"
+                                                    aria-label={`تعديل ${item.label}`}
+                                                />
+                                            ) : (
+                                                <span
+                                                    className={`inline-flex items-center justify-center rounded-md p-1 ${dashboardSettings[item.key] ? 'bg-green-50' : 'bg-red-50'}`}
+                                                    aria-label={dashboardSettings[item.key] ? `${item.label} مفعلة` : `${item.label} مخفية`}
+                                                >
+                                                    {dashboardSettings[item.key] ? (
+                                                        <Check size={18} className="text-green-700" />
+                                                    ) : (
+                                                        <X size={18} className="text-red-700" />
+                                                    )}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+
+                        <div className="mt-4 border-t border-[#e6d7d4] pt-4">
+                            <input
+                                ref={excelInputRef}
+                                type="file"
+                                accept=".xlsx,.xls"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                                id="excel-upload"
+                                aria-label="رفع ملف إحصائيات"
+                            />
+                            <div className="mb-2 flex items-center justify-between gap-3">
+                                <h4 className="text-base font-bold text-[#6F1A28] font-[Cairo]">البيانات</h4>
+                                <button
+                                    type="button"
+                                    onClick={() => excelInputRef.current?.click()}
+                                    disabled={isUploading}
+                                    className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold font-[Cairo] text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ab686f] focus-visible:ring-offset-2 ${isUploading ? 'bg-[#ab686f]/70 cursor-not-allowed' : 'bg-[#ab686f] hover:bg-[#95545b] shadow-sm hover:shadow-md'}`}
+                                >
+                                    <Upload className="w-4 h-4" />
+                                    <span>{isUploading ? 'جاري الرفع...' : 'رفع ملف إحصائيات (Excel)'}</span>
+                                </button>
+                            </div>
+                            <p className="text-xs text-[#6F1A28]/80 font-[Cairo] text-right">
+                                ارفع ملف .xlsx لتحديث الأرقام المعروضة في الصفحة الرئيسية.
+                            </p>
+                            {uploadedFile && (
+                                <div className="mt-2 flex items-center gap-2">
+                                    <span className="text-sm text-[#291613] font-[Cairo]">الملف المختار:</span>
+                                    <span className="text-sm font-medium text-[#6F1A28] font-[Cairo]">{uploadedFile.name}</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -715,50 +929,91 @@ export default function AdminMain() {
 
                 {/* Bottom Project Section */}
                 <div className="bg-[#F3E3E3] rounded-[16px] sm:rounded-[18px] md:rounded-[20px] p-4 sm:p-6 md:p-8 lg:p-10 shadow-xl border border-[#f0d8c2] w-full relative" dir="rtl">
-                    <div className="flex items-start justify-between gap-4 mb-4 sm:mb-8 flex-row-reverse">
+                    <div className="flex flex-col md:flex-row-reverse items-stretch md:items-start justify-between gap-4 mb-4 sm:mb-8">
+                        <div className="order-1 md:hidden flex justify-end">
+                            <div className="flex flex-row-reverse items-center gap-2 rounded-xl bg-white/60 px-2 py-1">
+                                <ProjectStatusDropdown
+                                    currentStatus={projectStatus}
+                                    onStatusChange={setProjectStatus}
+                                    compact
+                                />
 
-                        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                            <button
-                                onClick={() => setShowEditModal(true)}
-                                className="p-2 hover:bg-white/50 rounded-lg transition-colors"
-                                aria-label="تعديل المشروع"
-                            >
-                                <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                            </button>
-
-                            <div className="relative group">
                                 <button
-                                    onClick={() => setIsProjectHidden(!isProjectHidden)}
-                                    className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
-                                    aria-label={isProjectHidden ? "إظهار المشروع" : "إخفاء المشروع"}
+                                    onClick={() => setShowEditModal(true)}
+                                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                                    aria-label="تعديل المشروع"
                                 >
-                                    {isProjectHidden ? (
-                                        <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                                    ) : (
-                                        <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-                                    )}
+                                    <SquarePen className="w-4 h-4 text-gray-600" />
                                 </button>
 
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white text-gray-700 text-xs rounded-lg shadow-lg border border-gray-200 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                    {isProjectHidden ? "إظهار المشروع" : "إخفاء المشروع"}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
+                                <div className="relative group">
+                                    <button
+                                        onClick={() => setIsProjectHidden(!isProjectHidden)}
+                                        className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
+                                        aria-label={isProjectHidden ? "إظهار المشروع" : "إخفاء المشروع"}
+                                    >
+                                        {isProjectHidden ? (
+                                            <EyeOff className="w-4 h-4 text-gray-600" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-gray-600" />
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex-1 text-center">
-                            <h2 className="text-[#6F1A28] font-bold text-[19px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-[Cairo] mb-6">
+                        <div className="hidden md:flex order-3 md:order-1 w-full md:w-auto items-center gap-2 flex-shrink-0 justify-end rounded-xl bg-white/60 px-2 py-1">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowEditModal(true)}
+                                    className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+                                    aria-label="تعديل المشروع"
+                                >
+                                    <SquarePen className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                </button>
+
+                                <div className="relative group">
+                                    <button
+                                        onClick={() => setIsProjectHidden(!isProjectHidden)}
+                                        className="p-2 hover:bg-white/50 rounded-lg transition-colors relative"
+                                        aria-label={isProjectHidden ? "إظهار المشروع" : "إخفاء المشروع"}
+                                    >
+                                        {isProjectHidden ? (
+                                            <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                                        )}
+                                    </button>
+
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white text-gray-700 text-xs rounded-lg shadow-lg border border-gray-200 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                        {isProjectHidden ? "إظهار المشروع" : "إخفاء المشروع"}
+                                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="order-2 md:order-2 flex-1 text-right md:text-center min-w-0">
+                            <h2 className="text-[#6F1A28] font-bold text-[19px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-[Cairo] mb-4 sm:mb-6 text-right md:text-center">
                                 {activeProject.title}
                             </h2>
 
-                            <div className="w-full max-w-[600px] mx-auto h-[2px] bg-[#B98A91] mb-6" />
+                            <div className="w-full max-w-[600px] md:mx-auto h-[2px] bg-[#B98A91] mb-4 sm:mb-6" />
 
-                            <p className="text-gray-700 text-[13px] sm:text-[14px] md:text-[15px] leading-relaxed font-[Cairo] max-w-4xl mx-auto">
-                                {activeProject.description}
-                            </p>
+                            <ul className="max-w-4xl w-full md:mx-auto text-right text-sm md:text-[15px] leading-relaxed space-y-2">
+                                {projectDescriptionPoints.map((point, index) => (
+                                    <li
+                                        key={`${point}-${index}`}
+                                        className="text-gray-700 font-[Cairo] flex items-start gap-2.5"
+                                    >
+                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#8D2E46] shrink-0" />
+                                        <span>{point}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
 
-                        <div className="flex justify-start flex-shrink-0">
+                        <div className="hidden md:flex order-2 md:order-3 justify-end md:justify-start flex-shrink-0 w-full md:w-auto">
                             <ProjectStatusDropdown
                                 currentStatus={projectStatus}
                                 onStatusChange={setProjectStatus}
@@ -766,18 +1021,18 @@ export default function AdminMain() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_1fr] items-center pt-6" dir="rtl">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:gap-0 items-stretch pt-4 sm:pt-6" dir="rtl">
 
-                        <div className="flex flex-col items-center text-center">
-                            <p className="text-gray-600 text-[19px] font-medium mb-3 font-[Cairo]">
+                        <div className="flex flex-col items-center justify-center text-center rounded-xl bg-white/40 p-3 sm:bg-transparent sm:p-0">
+                            <p className="text-gray-600 text-sm sm:text-[19px] font-medium mb-2 sm:mb-3 font-[Cairo]">
                                 عدد المستفيدين :
                             </p>
 
-                            <div className="flex items-center gap-3">
-                                <span className="text-[#6F1A28] font-bold text-[20px] font-[Cairo]">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <span className="text-[#6F1A28] font-bold text-lg sm:text-[20px] font-[Cairo]">
                                     {activeProject.beneficiaries}
                                 </span>
-                                <Users className="w-6 h-6 text-yellow-400" />
+                                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
                             </div>
                         </div>
 
@@ -786,16 +1041,16 @@ export default function AdminMain() {
                             <span className="w-[3px] h-24 bg-[#d9bdc1]" />
                         </div>
 
-                        <div className="flex flex-col items-center text-center">
-                            <p className="text-gray-600 text-[19px] font-medium mb-3 font-[Cairo]">
+                        <div className="flex flex-col items-center justify-center text-center rounded-xl bg-white/40 p-3 sm:bg-transparent sm:p-0">
+                            <p className="text-gray-600 text-sm sm:text-[19px] font-medium mb-2 sm:mb-3 font-[Cairo]">
                                 التبرعات للمشروع :
                             </p>
 
-                            <div className="flex items-center gap-3">
-                                <span className="text-[#6F1A28] font-bold text-[20px] font-[Cairo]">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                                <span className="text-[#6F1A28] font-bold text-lg sm:text-[20px] font-[Cairo]">
                                     {activeProject.donations.toLocaleString()}
                                 </span>
-                                <HandCoins className="w-6 h-6 text-yellow-400" />
+                                <HandCoins className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" />
                             </div>
                         </div>
 
@@ -803,16 +1058,16 @@ export default function AdminMain() {
                             <span className="w-[3px] h-24 bg-[#d9bdc1]" />
                         </div>
 
-                        <div className="flex flex-col items-center text-center">
-                            <p className="text-gray-600 text-[19px] font-medium mb-3 font-[Cairo]">
+                        <div className="flex flex-col items-center justify-center text-center rounded-xl bg-white/40 p-3 sm:bg-transparent sm:p-0">
+                            <p className="text-gray-600 text-sm sm:text-[19px] font-medium mb-2 sm:mb-3 font-[Cairo]">
                                 نسبة اكتمال المشروع :
                             </p>
 
-                            <span className="text-[#6F1A28] font-bold text-[20px] font-[Cairo] mb-2">
+                            <span className="text-[#6F1A28] font-bold text-lg sm:text-[20px] font-[Cairo] mb-2">
                                 %{activeProject.progress}
                             </span>
 
-                            <div className="w-[200px] bg-gray-300 rounded-full h-3 overflow-hidden">
+                            <div className="w-full max-w-[220px] mx-auto bg-gray-300 rounded-full h-3 overflow-hidden">
                                 <div className="bg-yellow-400 h-3 rounded-full" style={{ width: `${activeProject.progress}%`, marginLeft: 'auto', }} />
                             </div>
                         </div>
@@ -1155,6 +1410,6 @@ export default function AdminMain() {
                     </div>
                 </Modal>
             )}
-        </AdminLayout >
+        </>
     );
 }

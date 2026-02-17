@@ -1,13 +1,15 @@
-import SidebarLayout from '../../ui/Sidebar';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserSettings() {
-    return (
-        <SidebarLayout>
-            <div className="h-full flex items-center justify-center">
-                <p className="text-xl font-semibold text-gray-800">
-                    انت بصفحة الإعدادات الخاصة بالمستخدم
-                </p>
-            </div>
-        </SidebarLayout>
-    );
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        navigate('/user/main', {
+            replace: true,
+            state: { showSettingsComingSoonToast: true },
+        });
+    }, [navigate]);
+
+    return <div className="h-full" />;
 }

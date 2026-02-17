@@ -64,7 +64,8 @@ export default function SignIn() {
 
       const data = await res.json();
 
-      login(null, data.access, data.refresh); 
+      // Provide a minimal user object to satisfy AuthContext login signature
+      login({ name: '', email: formData.email, role: 'user' }, data.access, data.refresh);
       navigate('/');
       
     } catch (err) {

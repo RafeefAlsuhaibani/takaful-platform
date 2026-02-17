@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AdminLayout from "../../layout/AdminLayout";
 import { FiSearch } from "react-icons/fi";
 import {
     Mail,
@@ -1388,12 +1387,12 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
             </div>
 
             {/* التبويبات */}
-            <div className="w-full max-w-[420px] mx-auto bg-[#c87981] rounded-[18px] px-2 py-2 shadow-[0px_3px_15px_#8d2e4626] flex flex-row-reverse gap-1 justify-between">
+            <div className="w-full max-w-[420px] mx-auto bg-[#c87981] rounded-[18px] px-2 py-2 shadow-[0px_3px_15px_#8d2e4626] flex flex-col sm:flex-row sm:flex-row-reverse gap-1 justify-between">
                 <button
                     type="button"
                     onClick={() => setActiveTab("projects")}
                     className={[
-                        "flex-1 min-w-[160px] px-4 py-2 rounded-[14px] text-sm md:text-base font-[Cairo] text-center transition-all duration-150",
+                        "w-full sm:flex-1 min-w-0 px-4 py-2 rounded-[14px] text-sm md:text-base font-[Cairo] text-center transition-all duration-150",
                         activeTab === "projects"
                             ? "bg-[#fdf8f9] text-[#2e2b2c] shadow-[0px_2px_8px_#8d2e4680]"
                             : "bg-transparent text-[#fdf8f9]",
@@ -1405,7 +1404,7 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                     type="button"
                     onClick={() => setActiveTab("volunteers")}
                     className={[
-                        "flex-1 min-w-[160px] px-4 py-2 rounded-[14px] text-sm md:text-base font-[Cairo] text-center transition-all duration-150",
+                        "w-full sm:flex-1 min-w-0 px-4 py-2 rounded-[14px] text-sm md:text-base font-[Cairo] text-center transition-all duration-150",
                         activeTab === "volunteers"
                             ? "bg-[#fdf8f9] text-[#2e2b2c] shadow-[0px_2px_8px_#8d2e4680]"
                             : "bg-transparent text-[#fdf8f9]",
@@ -1482,7 +1481,7 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                                 {v.current}
                                             </td>
                                             <td className="py-2 px-2">
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex flex-row-reverse items-center gap-2">
                                                     <div className="w-full h-[5px] rounded-full bg-[#f0dde2] overflow-hidden">
                                                         <div
                                                             className="h-full rounded-full"
@@ -1492,7 +1491,7 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                                             }}
                                                         />
                                                     </div>
-                                                    <span className="text-[#2e2b2c] min-w-[32px] text-left">
+                                                    <span className="text-[#2e2b2c] min-w-[32px] text-right">
                                                         {rate}%
                                                     </span>
                                                 </div>
@@ -1508,13 +1507,13 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                     <div className="space-y-3">
                         {/* الدروب ليست على اليسار */}
                         <div className="flex justify-end">
-                            <div className="relative w-[220px]">
+                            <div className="relative w-full max-w-[220px] text-right">
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setIsVolunteerSelectOpen((prev) => !prev)
                                     }
-                                    className="w-[220px] h-[40px] rounded-[18px] border border-[#e0cfd4] bg-[#fdf8f9] px-4 pr-4 pl-8 text-[13px] text-[#2e2b2c] font-[Cairo] flex items-center justify-between"
+                                    className="w-full h-[40px] rounded-[18px] border border-[#e0cfd4] bg-[#fdf8f9] px-4 pr-4 pl-8 text-[13px] text-[#2e2b2c] font-[Cairo] flex items-center justify-between text-right"
                                 >
                                     <span className="flex-1 text-right">
                                         {selectedVolunteer || "اختر متطوع"}
@@ -1523,7 +1522,7 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                 </button>
 
                                 {isVolunteerSelectOpen && (
-                                    <div className="absolute z-10 mt-1 w-[220px] rounded-[12px] bg-white shadow-[0px_8px_20px_#00000026] border border-[#e0cfd4] overflow-hidden text-[13px] max-h-[220px] overflow-y-auto custom-scrollbar">
+                                    <div className="absolute z-10 mt-1 w-full rounded-[12px] bg-white shadow-[0px_8px_20px_#00000026] border border-[#e0cfd4] overflow-hidden text-[13px] max-h-[220px] overflow-y-auto custom-scrollbar">
                                         {volunteersPerformance.map((v) => (
                                             <button
                                                 key={v.name}
@@ -1545,12 +1544,12 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                             </div>
                         </div>
 
-                        <div className="bg-[#fdf8f9] rounded-[18px] shadow-[0px_3px_15px_#8d2e4626] px-6 py-8 flex items-center justify-center">
+                        <div className="bg-[#fdf8f9] rounded-[18px] shadow-[0px_3px_15px_#8d2e4626] px-4 sm:px-6 py-6 sm:py-8 text-right">
                             {selectedVolunteerObj && selectedPerfRow ? (
                                 <div className="w-full">
-                                    <div className="flex flex-col md:flex-row items-stretch gap-6">
+                                    <div className="flex flex-col md:flex-row items-stretch gap-4 md:gap-6 text-right">
                                         {/* يمين: معلومات عامة */}
-                                        <div className="w-full md:w-[40%] flex flex-col items-end text-right space-y-1">
+                                        <div className="w-full md:w-[40%] rounded-xl bg-white/60 p-3 sm:p-4 flex flex-col text-right space-y-2">
                                             <div className="text-[15px] font-[Cairo] font-bold text-[#2e2b2c]">
                                                 تقرير فردي - {selectedVolunteerObj.name}
                                             </div>
@@ -1558,28 +1557,28 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                                 {selectedVolunteerObj.skills[0] || "متطوع"}
                                             </div>
 
-                                            <div className="mt-4 space-y-2 text-[12px] font-[Cairo]">
-                                                <div className="flex flex-col items-end gap-[2px]">
-                                                    <span className="text-[#6b6567]">
+                                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2 text-[12px] font-[Cairo]">
+                                                <div className="rounded-lg border border-[#ecd8dd] bg-white px-3 py-2 space-y-1">
+                                                    <span className="block text-[#6b6567] text-right">
                                                         تاريخ الانضمام
                                                     </span>
-                                                    <span className="text-[13px] font-semibold text-[#2e2b2c]">
+                                                    <span className="block text-[13px] font-semibold text-[#2e2b2c] text-right">
                                                         {selectedPerfRow.joinDate}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-col items-end gap-[2px]">
-                                                    <span className="text-[#6b6567]">
+                                                <div className="rounded-lg border border-[#ecd8dd] bg-white px-3 py-2 space-y-1">
+                                                    <span className="block text-[#6b6567] text-right">
                                                         المهام المكتملة
                                                     </span>
-                                                    <span className="text-[13px] font-semibold text-[#2e2b2c]">
+                                                    <span className="block text-[13px] font-semibold text-[#2e2b2c] text-right">
                                                         {selectedPerfRow.completed}
                                                     </span>
                                                 </div>
-                                                <div className="flex flex-col items-end gap-[2px]">
-                                                    <span className="text-[#6b6567]">
+                                                <div className="rounded-lg border border-[#ecd8dd] bg-white px-3 py-2 space-y-1 sm:col-span-2 md:col-span-1">
+                                                    <span className="block text-[#6b6567] text-right">
                                                         المهام الحالية
                                                     </span>
-                                                    <span className="text-[13px] font-semibold text-[#2e2b2c]">
+                                                    <span className="block text-[13px] font-semibold text-[#2e2b2c] text-right">
                                                         {selectedPerfRow.current}
                                                     </span>
                                                 </div>
@@ -1587,7 +1586,7 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                         </div>
 
                                         {/* يسار: المهام الأخيرة */}
-                                        <div className="w-full md:w-[60%] flex flex-col gap-3 text-right">
+                                        <div className="w-full md:w-[60%] rounded-xl bg-white/50 p-3 sm:p-4 flex flex-col gap-3 text-right">
                                             <div className="text-[14px] font-[Cairo] font-semibold text-[#2e2b2c] text-right">
                                                 المهام الأخيرة
                                             </div>
@@ -1600,12 +1599,12 @@ const PerformanceReportsSection: React.FC<PerformanceReportsSectionProps> = ({
                                                     selectedVolunteerTasks.map((t) => (
                                                         <div
                                                             key={t.id}
-                                                            className="flex items-center justify-between gap-3"
+                                                            className="w-full rounded-lg border border-[#ecd8dd] bg-white px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3"
                                                         >
-                                                            <span className="text-[#6b6567] min-w-[80px] text-right">
+                                                            <span className="text-[#6b6567] text-right shrink-0">
                                                                 {t.dueDate}
                                                             </span>
-                                                            <div className="flex-1 text-right text-[#2e2b2c]">
+                                                            <div className="w-full sm:flex-1 text-right text-[#2e2b2c]">
                                                                 {t.title}
                                                             </div>
                                                             <span
@@ -1682,11 +1681,10 @@ const VolunteerManagement: React.FC = () => {
     });
 
     return (
-        <AdminLayout>
             <section dir="rtl" className="space-y-8">
                 {/* البحث */}
                 <div dir="ltr" className="flex justify-start">
-                    <div className="relative w-[321px] h-[42px]">
+                    <div className="relative w-full max-w-[321px] h-[42px]">
                         <div className="absolute inset-0 bg-[#faf6f76b] rounded-[20px] shadow-[inset_0px_0px_8px_#f3e3e3e0,0px_4px_15px_#8d2e4682]" />
 
                         <input
@@ -1714,7 +1712,6 @@ const VolunteerManagement: React.FC = () => {
                     volunteers={filteredVolunteers}
                 />
             </section>
-        </AdminLayout>
     );
 };
 

@@ -41,7 +41,14 @@ export default function ServiceDialog({ service, open, onClose }: ServiceDialogP
       return;
     }
 
-    // إذا كان المستخدم مسجل دخول
+    // التحقق إذا كانت الخدمة هي سقيا الماء
+    if (service.id === 'water-supply-request') {
+      onClose && onClose();
+      navigate('/services/water-supply');
+      return;
+    }
+
+    // إذا كان المستخدم مسجل دخول للخدمات الأخرى
     // إغلاق الدايلوج
     onClose && onClose();
     // عرض رسالة النجاح

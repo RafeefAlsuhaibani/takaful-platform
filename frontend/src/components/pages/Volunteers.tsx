@@ -168,12 +168,18 @@ type Volunteer = {
 };
 
 
+
+
 export default function Volunteers() {
   const navigate = useNavigate();
 // backend
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 767px)').matches;
+  });
 
 
   // English digits
@@ -206,6 +212,17 @@ export default function Volunteers() {
   
       fetchVolunteers();
     }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const media = window.matchMedia('(max-width: 767px)');
+    const onChange = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    setIsMobile(media.matches);
+    media.addEventListener('change', onChange);
+
+    return () => media.removeEventListener('change', onChange);
+  }, []);
   
 
   // تأكد أن القطاع الذهبي (نساء) هو الثاني عشان يكمل باقي الدائرة
@@ -291,50 +308,52 @@ export default function Volunteers() {
                   motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:transform-none
                 `}
               >
-                <AnimatedDonut
-                  size={300}
-                  strokeWidth={22}
-                  segments={donutData.segments}
-                  gapDegrees={4}
-                  spinOnMount
-                  spinDurationMs={900}
-                  spinTurns={1}
-                  centerTitle="إحصائية المتطوعين"
-                />
+                <div className="max-w-full">
+                  <AnimatedDonut
+                    size={isMobile ? 190 : 300}
+                    strokeWidth={22}
+                    segments={donutData.segments}
+                    gapDegrees={4}
+                    spinOnMount
+                    spinDurationMs={900}
+                    spinTurns={1}
+                    centerTitle="إحصائية المتطوعين"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Bigger Stats Cards (يسار) */}
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5">
               {stats.map((stat, i) => {
                 const Icon = stat.icon;
                 return (
                   <div
                     key={stat.label}
                     className="
-                      flex items-center gap-5
+                      flex items-center gap-2 sm:gap-5
                       bg-white/90
                       border border-[#f1f1f1]
                       rounded-2xl
-                      p-5
+                      p-3 sm:p-5
                       shadow-sm
                       transition-all duration-300
                       hover:shadow-md hover:-translate-y-1
-                      min-h-[110px]
+                      min-h-[88px] sm:min-h-[110px]
                     "
                     style={{ animation: `fadeUp 0.45s ease-out ${i * 0.06}s both` } as CSSProperties}
                   >
                     <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm shrink-0"
+                      className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm shrink-0"
                       style={{ backgroundColor: `${stat.accent}15`, color: stat.accent }}
                     >
-                      <Icon size={32} />
+                      <Icon size={isMobile ? 22 : 32} />
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-2xl font-bold text-slate-900 leading-tight">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-lg sm:text-2xl font-bold text-slate-900 leading-tight truncate">
                         {toEn(stat.value)}
                       </span>
-                      <span className="text-base text-slate-500">{stat.label}</span>
+                      <span className="text-xs sm:text-base text-slate-500 leading-tight">{stat.label}</span>
                     </div>
                   </div>
                 );

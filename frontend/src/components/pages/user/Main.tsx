@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import SidebarLayout from '../../ui/Sidebar';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   MapPin,
   Clock3,
@@ -10,9 +9,10 @@ import {
   Hourglass,
   MoreHorizontal,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Toast from '../../feedback/Toast';
 import type { ToastProps } from '../../feedback/Toast';
+import { useToast } from '../../../contexts/ToastContext';
 
 type TaskStatus = 'جديدة' | 'قيد التنفيذ' | 'معلقة';
 
@@ -203,11 +203,11 @@ function TaskCard({ task, onWithdraw, onOpen }: TaskCardProps) {
   return (
     <div
       dir="rtl"
-      className="rounded-[18px] bg-[#fdf5ee] px-5 py-4 shadow-[0_6px_14px_#0000000c] border border-[#f0e1d6]
+      className="rounded-[18px] bg-[#fdf5ee] p-3 sm:px-5 sm:py-4 shadow-[0_6px_14px_#0000000c] border border-[#f0e1d6]
                  flex flex-col gap-2 select-none cursor-default"
     >
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full">
+        <div className="flex items-start sm:items-center gap-1 min-w-0">
           {isPending ? (
             <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#fff7ea] border border-[#e2c9a2]">
               <StatusIcon
@@ -219,13 +219,13 @@ function TaskCard({ task, onWithdraw, onOpen }: TaskCardProps) {
             <StatusIcon className="w-4 h-4" style={{ color: statusColor }} />
           )}
 
-          <p className="text-[15px] font-bold leading-snug bg-gradient-to-l from-[#e4b106] via-[#d37a30] to-[#8d2e46] bg-clip-text text-transparent">
+          <p className="text-sm sm:text-[15px] font-bold leading-relaxed text-right break-words bg-gradient-to-l from-[#e4b106] via-[#d37a30] to-[#8d2e46] bg-clip-text text-transparent">
             {task.title}
           </p>
         </div>
 
         <span
-          className={`inline-flex items-center justify-center px-4 py-[3px] rounded-full border text-[11px] font-normal ${badgeClasses}`}
+          className={`inline-flex items-center justify-center px-3 sm:px-4 py-[3px] rounded-full border text-[11px] font-normal self-end sm:self-auto ${badgeClasses}`}
         >
           {task.status}
         </span>
@@ -239,21 +239,21 @@ function TaskCard({ task, onWithdraw, onOpen }: TaskCardProps) {
         {task.description}
       </p>
 
-      <div className="flex items-center justify-between w-full mt-2 text-[11px]">
-        <div className="flex items-center gap-3 text-[#7c7570]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full mt-2 text-[11px] gap-2 sm:gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-[#7c7570] text-right">
           <InfoItem icon={Clock3}>{task.duration}</InfoItem>
           <InfoItem icon={MapPin}>{task.location}</InfoItem>
           <InfoItem icon={CalendarClock}>{task.date}</InfoItem>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full sm:w-auto items-center gap-2">
           <div className="relative group cursor-default">
             <button
               type="button"
               disabled={isPending}
               onClick={() => !isPending && onOpen(task)}
               className={
-                `px-4 py-1 rounded-md text-white text-[11px] font-semibold 
+                `w-full sm:w-auto min-h-9 px-4 py-2 sm:py-1 rounded-md text-white text-[11px] font-semibold 
                  bg-[linear-gradient(90deg,rgba(184,71,85,1)_0%,rgba(228,177,6,1)_100%)]
                  transition ` +
                 (isPending
@@ -280,7 +280,7 @@ function TaskCard({ task, onWithdraw, onOpen }: TaskCardProps) {
 
           <button
             type="button"
-            className="px-3 py-1 rounded-md border border-[#c9b7a0] text-[#4e4a4b] text-[11px] font-semibold bg-[#fefcf9] hover:bg-gray-50 transition cursor-pointer select-none"
+            className="w-full sm:w-auto min-h-9 px-3 py-2 sm:py-1 rounded-md border border-[#c9b7a0] text-[#4e4a4b] text-[11px] font-semibold bg-[#fefcf9] hover:bg-gray-50 transition cursor-pointer select-none"
             onClick={() => onWithdraw(task)}
           >
             انسحاب
@@ -301,12 +301,27 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
 
   return (
     <div
-      className="rounded-2xl bg-[#faf6f7] border border-[#e6d2d7] px-3 py-2 shadow-[0_4px_12px_#0000000d]
+      className="w-full rounded-2xl bg-[#faf6f7] border border-[#e6d2d7] p-4 sm:p-5 md:px-3 md:py-2 shadow-[0_4px_12px_#0000000d]
                  select-none cursor-default"
       dir="rtl"
     >
-      <div className="flex items-center gap-4">
-        <div className="w-[105px] h-[72px] rounded-[10px] border border-[#e6d2d7] bg-white flex items-center justify-center overflow-hidden shrink-0">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+        <div className="md:hidden flex items-center justify-between w-full">
+          <div className="w-12 h-12 rounded-[10px] border border-[#e6d2d7] bg-white flex items-center justify-center overflow-hidden shrink-0">
+            <img
+              src={opportunity.logoUrl}
+              alt={opportunity.org}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+          <span
+            className={`px-2 py-1 rounded-full border text-xs font-normal shrink-0 ${urgencyBadge}`}
+          >
+            {opportunity.urgency}
+          </span>
+        </div>
+
+        <div className="hidden md:flex w-[105px] h-[72px] rounded-[10px] border border-[#e6d2d7] bg-white items-center justify-center overflow-hidden shrink-0">
           <img
             src={opportunity.logoUrl}
             alt={opportunity.org}
@@ -314,17 +329,21 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           />
         </div>
 
-        <div className="flex-1 flex flex-col gap-1 text-right">
-          <div className="flex items-center w-full mt-1">
-            <p className="text-[15px] font-medium text-[#4e4a4b] leading-snug flex-1 ml-2">
+        <div className="flex-1 min-w-0 flex flex-col text-right space-y-2">
+          <div className="hidden md:flex items-center w-full mt-1">
+            <p className="text-[15px] font-medium text-[#4e4a4b] leading-snug flex-1 min-w-0">
               {opportunity.title}
             </p>
             <span
-              className={`px-3 py-[1px] rounded-full border text-[10px] font-normal shrink-0 ${urgencyBadge} ms-auto`}
+              className={`px-3 py-[1px] rounded-full border text-[10px] font-normal shrink-0 ms-auto ${urgencyBadge}`}
             >
               {opportunity.urgency}
             </span>
           </div>
+
+          <p className="md:hidden text-sm font-medium text-[#4e4a4b] leading-snug min-w-0 break-words">
+            {opportunity.title}
+          </p>
 
           <p className="text-[13px] text-[#a54c62cc] font-medium mt-1">
             {opportunity.category}
@@ -334,8 +353,8 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-[#6e6d6d]">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 text-[11px] text-[#6e6d6d]">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 text-xs sm:text-[11px] text-right">
           <InfoItem icon={Users}>{opportunity.people}</InfoItem>
           <InfoItem icon={Clock3}>{opportunity.duration}</InfoItem>
           <InfoItem icon={MapPin}>{opportunity.location}</InfoItem>
@@ -344,7 +363,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
         <button
           type="button"
           onClick={onApply}
-          className="px-3 py-1.5 rounded-[8px] bg-[#a54c63] text-white text-[12px] font-medium hover:brightness-110 transition cursor-pointer select-none"
+          className="w-full sm:w-auto mt-3 sm:mt-0 px-4 py-2 sm:py-1.5 rounded-[8px] bg-[#a54c63] text-white text-[12px] font-medium hover:brightness-110 transition cursor-pointer select-none"
         >
           التقدم الآن
         </button>
@@ -534,9 +553,9 @@ function OpportunitiesSection() {
       </div>
 
       <section
-        className="rounded-[25px] shadow-[-1px_5px_11px_#00000008,-3px_20px_20px_#00000008,-7px_45px_28px_#00000005,-12px_81px_33px_transparent,-18px_126px_36px_transparent]
+        className="w-full rounded-[25px] shadow-[-1px_5px_11px_#00000008,-3px_20px_20px_#00000008,-7px_45px_28px_#00000005,-12px_81px_33px_transparent,-18px_126px_36px_transparent]
                    bg-[linear-gradient(0deg,rgba(250,246,247,0.8)_0%,rgba(250,246,247,0.8)_100%),linear-gradient(223deg,rgba(152,66,88,1)_0%,rgba(165,86,78,1)_33%,rgba(228,180,32,1)_100%)]
-                   p-6 select-none cursor-default"
+                   p-4 sm:p-5 md:p-6 select-none cursor-default"
         dir="rtl"
       >
         <header className="mb-3 flex flex-col items-center gap-2">
@@ -580,7 +599,7 @@ function OpportunitiesSection() {
           onClick={handleCancelApply}
         >
           <div
-            className="bg-white rounded-3xl p-8 w-[400px] shadow-2xl border-4 border-[#C49FA3]"
+            className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md mx-4 shadow-2xl border-4 border-[#C49FA3]"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -702,7 +721,7 @@ function TasksSection({ onMoreClick }: TasksSectionProps) {
         className="rounded-[25px]
                    shadow-[-5px_8px_19px_#00000008,-18px_30px_35px_#00000008,-41px_68px_48px_#00000005,-72px_122px_57px_transparent,-113px_190px_62px_transparent]
                    bg-[linear-gradient(0deg,rgba(246,226,229,1)_0%,rgba(248,231,203,1)_100%)]
-                   p-6 select-none cursor-default"
+                   p-4 sm:p-6 select-none cursor-default"
         dir="rtl"
       >
         <header className="mb-4 flex flex-col items-center gap-2">
@@ -760,7 +779,7 @@ function TasksSection({ onMoreClick }: TasksSectionProps) {
           onClick={handleCancelWithdraw}
         >
           <div
-            className="bg-white rounded-3xl p-8 w-[400px] shadow-2xl border-4 border-[#E2C9A2]"
+            className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md mx-4 shadow-2xl border-4 border-[#E2C9A2]"
             style={{ direction: 'rtl' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -803,30 +822,48 @@ function TasksSection({ onMoreClick }: TasksSectionProps) {
 
 export default function UserMain() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { info } = useToast();
+  const hasHandledSettingsToast = useRef(false);
+
+  useEffect(() => {
+    const shouldShowToast = Boolean(
+      (location.state as { showSettingsComingSoonToast?: boolean } | null)
+        ?.showSettingsComingSoonToast
+    );
+
+    if (!shouldShowToast || hasHandledSettingsToast.current) return;
+    hasHandledSettingsToast.current = true;
+
+    info({
+      title: 'معلومة',
+      description: 'ميزة الإعدادات قادمة قريبًا إن شاء الله.',
+    });
+
+    navigate('/user/main', { replace: true, state: {} });
+  }, [info, location.state, navigate]);
 
   const handleTasksMore = () => {
     navigate('/user/tasks');
   };
 
   return (
-    <SidebarLayout>
-      <div className="h-full" dir="rtl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-          <HadithCard />
-          <SearchBox />
+    <div className="h-full" dir="rtl">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+        <HadithCard />
+        <SearchBox />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-4 items-center">
+          <StatsSection />
+          <OpportunitiesSection />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-4 items-center">
-            <StatsSection />
-            <OpportunitiesSection />
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <TasksSection onMoreClick={handleTasksMore} />
-          </div>
+        <div className="flex flex-col gap-4">
+          <TasksSection onMoreClick={handleTasksMore} />
         </div>
       </div>
-    </SidebarLayout>
+    </div>
   );
 }
