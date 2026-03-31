@@ -1,4 +1,3 @@
-import { Users, CalendarDays, MapPin } from 'lucide-react';
 import type { Service } from '../../types';
 import Icon from './Icon';
 import Badge from './Badge';
@@ -42,7 +41,7 @@ export default function ServiceCard({ service, onDetails }: ServiceCardProps) {
         {service.icon && (
           <Icon 
             name={service.icon} 
-            size={24} 
+            size={20} 
             className="text-[#DFC775] flex-shrink-0" 
           />
         )}
@@ -61,15 +60,15 @@ export default function ServiceCard({ service, onDetails }: ServiceCardProps) {
       {/* Meta Footer */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-4">
         <div className="flex items-center gap-1">
-          <Users size={14} />
+          <Icon name="Users" size={16} />
           <span>+{service.beneficiaries} مستفيد</span>
         </div>
         <div className="flex items-center gap-1">
-          <CalendarDays size={14} />
+          <Icon name="CalendarDays" size={16} />
           <span>{service.date}</span>
         </div>
         <div className="flex items-center gap-1">
-          <MapPin size={14} />
+          <Icon name="MapPin" size={16} />
           <span>{service.location}</span>
         </div>
       </div>

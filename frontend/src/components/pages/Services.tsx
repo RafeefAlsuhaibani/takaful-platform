@@ -277,7 +277,7 @@ function Services() {
       </section>
 
       {/* Filter Chips */}
-      <section className="py-8 bg-white">
+      <section className="py-8 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap items-center justify-center gap-3">
             {filters.map((filter) => (
